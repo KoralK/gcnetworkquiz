@@ -137,22 +137,37 @@ quizData.forEach((q, index) => {
 // Submit quiz
 document.getElementById("submit-btn").addEventListener("click", () => {
   let score = 0;
+  const results = []; // Array to store results for each question
+
   quizData.forEach((q, index) => {
     const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
-    if (selectedOption && selectedOption.value === q.answer) {
-      score++;
+    const isCorrect = selectedOption && selectedOption.value === q.answer;
+
+    if (isCorrect) {
+      score++; // Increment score for correct answers
     }
+
+    // Store result for this question
+    results.push({
+      question: q.question,
+      correctAnswer: q.options.find(opt => opt.startsWith(q.answer)),
+      userAnswer: selectedOption ? selectedOption.value : "Not answered",
+      isCorrect: isCorrect
+    });
   });
 
-  // Display results and answer key
+  // Display results
   resultsDiv.innerHTML = `
     <p>Your score: ${score} out of ${quizData.length}</p>
-    <p>Answer Key:</p>
-    <ol>
-      ${quizData.map((q, index) => {
-        const correctOption = q.options.find(opt => opt.startsWith(q.answer));
-        return `<li>${index + 1}. ${correctOption}</li>`;
-      }).join("")}
-    </ol>
+    <h2>Results:</h2>
+    <div class="results-container">
+      ${results.map((result, index) => `
+        <div class="result-item ${result.isCorrect ? "correct" : "incorrect"}">
+          <p><strong>Question ${index + 1}:</strong> ${result.question}</p>
+          <p><strong>Your Answer:</strong> ${result.userAnswer}</p>
+          <p><strong>Correct Answer:</strong> ${result.correctAnswer}</p>
+        </div>
+      `).join("")}
+    </div>
   `;
 });
